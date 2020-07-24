@@ -14,11 +14,11 @@ def square(x, y, size):
 def line_trace(max_w, max_h):
     random_stp = 50
     steps_b_trace = 2
-    steps_b_slugg = 1
+    steps_b_slugg = 2
     max_val = 10
     nr_steps = 100
     ratio_shift_range = 2
-    factor_slugg = 0.35
+    factor_slugg = 0.35 #0.35
 
     def create_line():
         def mean_val(line_i, start, end):
@@ -38,19 +38,18 @@ def line_trace(max_w, max_h):
                 k_bs = 0
 
             if line_new:
-                val_b1 = line_new[k-1][0]
-                val_b2 = line_new[k - 2][0]
+                val_slugg = mean_val(line_new, k_bs, k)
+                val_b = line_new[k-1][0]
             else:
-                val_b1,  val_b2 = 0, 0
+                val_slugg, val_b = 0, 0
 
-            x_val = mean_val(line_b, k_bt, k+1)
+            val_trace = mean_val(line_b, k_bt, k+1)
 
             randint = random.randint(0, random_stp)
             rand_shift = (-1/2 + randint/random_stp) * rand_range
-            calc_shift = factor_slugg * (val_b1 - val_b2)
+            calc_shift = factor_slugg * 2 * (val_slugg-val_b)
 
-            add_x = shift + rand_shift + calc_shift
-            x_new = x_val + add_x
+            x_new = val_trace + shift + rand_shift + calc_shift
             line_new.append([x_new, y])
         return line_new
 
@@ -72,6 +71,3 @@ def line_trace(max_w, max_h):
         line_b = create_line()
         lines.append(line_b)
     return lines
-
-
-
