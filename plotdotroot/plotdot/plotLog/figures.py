@@ -19,6 +19,12 @@ def line_trace(max_w, max_h):
     nr_steps = 100
     ratio_shift_range = 2
     factor_slugg = 0.35 #0.35
+    opposite = True
+
+    if opposite:
+        opp_dir = -1
+    else:
+        opp_dir = 1
 
     def create_line():
         def mean_val(line_i, start, end):
@@ -38,16 +44,26 @@ def line_trace(max_w, max_h):
                 k_bs = 0
 
             if line_new:
-                val_slugg = mean_val(line_new, k_bs, k)
-                val_b = line_new[k-1][0]
+                mean_before = mean_val(line_new, k_bs, k)
+                val_b1 = line_new[k - 1][0]
+                val_b2 = line_new[k - 2][0]
+                if val_b1 > val_b2:
+                    direct = 1
+                elif val_b1 < val_b2:
+                    direct = -1
+                else:
+                    direct = 0
             else:
-                val_slugg, val_b = 0, 0
+                mean_before, val_b1, val_b2 = 0, 0, 0
+                direct = 0
+
+            val_slugg = direct * 2 * abs(mean_before-val_b1)
 
             val_trace = mean_val(line_b, k_bt, k+1)
 
             randint = random.randint(0, random_stp)
             rand_shift = (-1/2 + randint/random_stp) * rand_range
-            calc_shift = factor_slugg * 2 * (val_slugg-val_b)
+            calc_shift = factor_slugg * val_slugg * opp_dir
 
             x_new = val_trace + shift + rand_shift + calc_shift
             line_new.append([x_new, y])
