@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import numpy as np
 
-from plotdot.plotLog.figures import square
+from plotdot.plotLog.figures import square, line_trace
 
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
+width = 100
+height = 100
 
 def svg_plot():
     """
@@ -58,7 +60,7 @@ def inter_plot():  # no plot_run
 def plot_lines(lines):
     figure(num=None, figsize=(10, 10), dpi=80, facecolor='w', edgecolor='k')
     plt_opts = {'color': 'black',
-                'linewidth': 1}
+                'linewidth': .8}
     for (x, y) in lines:
         plt.plot(x, y, **plt_opts)
     plt.show()
@@ -87,7 +89,15 @@ def squares_plot():
     plot_lines(lines)
 
 
+def linetraces():
+    lines = line_trace(100, 100)
+    transpose_lines(lines)
+    plot_lines(lines)
+
+
+
 if __name__ == '__main__':
     #svg_plot()
-    squares_plot()
+    #squares_plot()
+    linetraces()
 
