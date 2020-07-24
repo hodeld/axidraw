@@ -13,12 +13,12 @@ def square(x, y, size):
 
 def line_trace(max_w, max_h):
     random_stp = 50
-    steps_b_trace = 2
-    steps_b_slugg = 2
     max_val = 10
     nr_steps = 100
     ratio_shift_range = 2
-    factor_slugg = 0.35 #0.35
+    steps_b_trace = 2
+    steps_b_slugg = 3
+    factor_slugg = 1.0152  # 0.35 for non-opposite, 1.0152 for opposite at 3 steps
     opposite = True
 
     if opposite:
@@ -57,7 +57,7 @@ def line_trace(max_w, max_h):
                 mean_before, val_b1, val_b2 = 0, 0, 0
                 direct = 0
 
-            val_slugg = direct * 2 * abs(mean_before-val_b1)
+            val_slugg = direct * abs(mean_before-val_b1)
 
             val_trace = mean_val(line_b, k_bt, k+1)
 
