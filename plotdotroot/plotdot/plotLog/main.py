@@ -57,12 +57,17 @@ def inter_plot():  # no plot_run
     plt.show()
 
 
-def plot_lines(lines):
-    figure(num=None, figsize=(10, 10), dpi=80, facecolor='w', edgecolor='k')
+def plot_lines(lines, autoscale=True):
+    figure(num=None, figsize=(10, 10), dpi=80, facecolor='w', edgecolor='k',)
     plt_opts = {'color': 'black',
                 'linewidth': .8}
     for (x, y) in lines:
         plt.plot(x, y, **plt_opts)
+        plt.grid(True)
+
+    if type(autoscale) == tuple:
+        plt.xlim(0, autoscale[0])
+        plt.ylim(0, autoscale[1])
     plt.show()
 
 
@@ -90,9 +95,10 @@ def squares_plot():
 
 
 def linetraces():
-    lines = line_trace(100, 100)
+    lines = line_trace()
     transpose_lines(lines)
-    plot_lines(lines)
+    autoscale = (25, 25)
+    plot_lines(lines, autoscale)
 
 
 
