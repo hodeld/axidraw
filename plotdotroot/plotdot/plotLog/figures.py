@@ -11,7 +11,7 @@ def square(x, y, size):
     return path
 
 
-def line_trace(x0=6, x1=21, y0=5, y1=11, slope=.3):
+def line_trace(x0=0, xw=10, xh=0, y0=0, yw=0, yh=10, density=1):
     random_stp = 50
     nr_steps = 100
     ratio_shift_range = 2
@@ -68,40 +68,42 @@ def line_trace(x0=6, x1=21, y0=5, y1=11, slope=.3):
             calc_shift = factor_slugg * val_slugg * opp_dir
             x0_k = 0 #line0[k][0] # for bending
             x_new = x0_k + val_trace + shift + rand_shift + calc_shift
-            x_new_norm = (x_new + k * norm_slope_x) * norm_len_x + x_0
-            y_norm = (y + step_x * norm_slope_y) * norm_len_y + y_0
+            x_norm = x_new * norm_len_x + (x_0 + k * norm_slope_x)
+            y_norm = y * norm_len_y + line_nr * norm_slope_y + y_0
             line_new.append([x_new, y])
-            line_norm.append([x_new_norm, y_norm])
+            line_norm.append([x_norm, y_norm])
         return line_new, line_norm
 
     shift = rand_range * ratio_shift_range
-    max_w = x1-x0
-    max_h = y1-y0
+    max_w = xw-x0
+    max_h = yh-y0
+    w_x = (xh - x0)
+    h_y = (yw - y0)
 
-    steps = max_h/nr_steps
+    nr_lines = int(max_w / max_h * density * nr_steps)
+
     range_steps = range(nr_steps)
     x0_line = np.array([0] * nr_steps)
     yrange = np.array(range_steps)
-    #y0_line = yrange * steps
     y0_line = yrange
 
-    norm_len_x = max_w / (ratio_shift_range * nr_steps)
-    norm_slope_x = max_w / nr_steps
+    norm_len_x = max_w / (ratio_shift_range * nr_lines)
+    norm_slope_x = w_x / nr_steps
     x_0 = x0
-    norm_len_y = max_h / (nr_steps)
-    norm_slope_y = max_h / nr_steps
+    norm_len_y = max_h / nr_steps
+    norm_slope_y = h_y / nr_lines
     y_0 = y0
 
     line0 = np.column_stack((x0_line, y0_line))
     line_b = line0
 
-    step_x = 0
-    line_b, line_norm = create_line()
+    #line_nr = 0
+    #line_b, line_norm = create_line()
     #lines = [line_b]
     lines = []
 
-    for step_x in range(0, nr_steps):
-        print('step', step_x)
+    for line_nr in range(0, nr_lines):
+        print('line', line_nr)
         line_b, line_norm = create_line()
         lines.append(line_norm)
     return lines
