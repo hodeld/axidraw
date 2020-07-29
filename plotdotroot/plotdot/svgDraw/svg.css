@@ -1,7 +1,17 @@
+
+@font-face {
+    font-family: 'Perfect DOS';
+     src: local("Perfect DOS VGA 437 Win");  /* name of local installation */
+}
+
 .quittung-text {
-    font-size: 30;
-    font-family: "Terminal", monospace;
-    stroke: black;
+    font-family: 'Perfect DOS';
+    font-size: 12px;
+    line-height: 16px;
+    /*
+    letter-spacing: -1px;
+    line-height: 16px;
+    */
 }
 
 .shape {

@@ -1,115 +1,64 @@
-from pyaxidraw import axidraw
 import os
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure
-import numpy as np
+from datetime import datetime
 
-from plotdot.plotLog.figures import square, line_trace
+from plotdot.plotLog.figures import line_trace
+from plotdot.plotLog.patterns import linetraces
+from plotdot.plotLog.quittung import make_quittung
+from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, PX_MM, rect_layer
+import svgwrite
+from svgwrite.extensions import Inkscape
+
+
+height_p = 230
+width_p = 180
+height_q = 100
+mx = 10
+my = 10
+width_graph = width_p - 2 * mx
+height_graph = height_p - height_q
+x_graph = mx
+y_graph = my
 
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+px_mm = PX_MM
 
-width = 100
-height = 100
 
-def svg_plot():
-    """
-
-    0 - Do not render previews
-    1 - Render pen-down movement only
-    2 - Render pen-up movement only
-    3 - Render all movement, both pen-up and pen-down [DEFAULT]
-
-    :return:
-    """
-    ad = axidraw.AxiDraw()
-    file_name = 'logoetiki' + '.svg'  # 'logoetiki.svg' 'AxiDraw_trivial'
-
+def plot_order():
+    def layer_name():
+        nonlocal k
+        ln_k = ''.join([str(k), '-', ln])
+        k += 1
+        return ln_k
+    file_name = 'layer' + '.svg'
     f_path = os.path.join(prjct_root_path, file_name)
-    ad.plot_setup(f_path)
-    ad.options.rendering = 3
-    ad.options.preview = True
+    dwg = svgwrite.Drawing(f_path, profile='full', size=(width_p*px_mm, height_p*px_mm))
+    inkscape = Inkscape(dwg)
 
-    ad.options.report_time = True
-    ad.options.pen_pos_down = 40
-    ad.options.pen_pos_up = 30
-    output_svg = ad.plot_run(True)
-    outp_name = 'gensvg.svg'
-    save_file(output_svg, outp_name)
-    print("{0}".format(ad.pt_estimate))
+    k = 1
+    ln = 'layer'
+    label_n = layer_name()
+    txt_defs = make_quittung(x0=mx, y0=height_graph + my, w_tot=width_p)
+    text_svg_layer(dwg, inkscape, label_n, txt_defs)
 
+    text_defs_t = [('ztp: ' + datetime.now().strftime('%c'), (10, 10))]
+    label_n = layer_name()
+    text_svg_layer(dwg, inkscape, label_n, text_defs_t)
 
-def save_file(output_svg, n):
-    outp_name = n
-    save_f = os.path.join(prjct_root_path, outp_name)
-    with open(save_f, 'w') as f:
-        f.write(output_svg)
+    x0, y0, = 100, 40
+    xmax, ymax = 150, 100
 
+    lines = line_trace(x0=x0, xw=xmax, xh=x0, y0=y0, yw=y0 + 3, yh=ymax, density=.2)  #
+    label_n = layer_name()
+    polyline_svg_layer(dwg, inkscape, label_n, lines)
 
-def inter_plot():  # no plot_run
-    lines = []
-    plt_opts = {'color': 'black',
-                'linewidth': 1}
-    for i in range(1, 50):
-        y_arr = [1 + i, 2 * i, 3]
-        x_arr = [3 + 1.5*i, 4, 6 * i/2]
-        lines.append((x_arr, y_arr))
-        plt.plot(x_arr, y_arr, **plt_opts)     # k=black
-    plt.show()
+    rect_shape = (x_graph, y_graph, width_graph, height_graph)
+    label_n = layer_name()
+    rect_layer(dwg, inkscape, label_n, rect_shape)
+    dwg.save()
 
 
-def plot_lines(lines, autoscale=True):
-    figure(num=None, figsize=(10, 10), dpi=80, facecolor='w', edgecolor='k',)
-    if type(autoscale) == tuple:
-        plt.xlim(0, autoscale[0])
-        plt.ylim(0, autoscale[1])
-        line_width = 10 / autoscale[0]
-    else:
-        line_width = 0.8
-    plt_opts = {'color': 'black',
-                'linewidth': line_width}
-    for (x, y) in lines:
-        plt.plot(x, y, **plt_opts)
-        plt.grid(True)
-
-
-    plt.show()
-
-
-def transpose_lines(lines):
-    lines_c = lines.copy()
-    for i, l in enumerate(lines_c):
-        l_arr = np.array(l)
-        l_t = l_arr.transpose()
-        lines[i] = l_t
-
-
-def squares_plot():
-    width = 100
-    height = 100
-    cx = width / 2
-    cy = height / 2
-    lines = []
-    for i in range(1,4):
-        margin = 0.25
-        size = i + 1
-        lines.append(square(cx, cy, size))
-        lines.append(square(cx, cy, size + margin))
-    transpose_lines(lines)
-    plot_lines(lines)
-
-
-def linetraces():
-    lines = line_trace(x0=3, xw=10, xh=0, y0=1, yw=3, yh=18)
-    #lines = line_trace()
-    transpose_lines(lines)
-    autoscale = (20, 20)
-    #autoscale = True
-    plot_lines(lines, autoscale)
 
 
 
 if __name__ == '__main__':
-    #svg_plot()
-    #squares_plot()
-    linetraces()
-
+    plot_order()

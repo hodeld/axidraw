@@ -12,6 +12,9 @@ def square(x, y, size):
 
 
 def line_trace(x0=0, xw=10, xh=0, y0=0, yw=0, yh=10, density=1):
+    """
+    :return: iteratable with points in a list [(x,y)]
+    """
     random_stp = 50
     nr_steps = 100
     ratio_shift_range = 2
