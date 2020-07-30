@@ -2,6 +2,10 @@ import svgwrite
 import os
 
 # import svgutils.transform as st
+from svgwrite.extensions import Inkscape
+
+from plotdotproject.settings import BASE_DIR
+
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 PX_MM = 3.543307
 
@@ -102,6 +106,18 @@ def text_blocks_svg():
     return txt_blk
 
 
+def init_dwg(size):
+    dwg = svgwrite.Drawing(profile='full', size=size)
+    inkscape = Inkscape(dwg)
+    css_name = 'svg' + '.css'
+    mod_path = os.path.join(BASE_DIR, 'plotdot/svgDraw')
+    css_path = os.path.join(mod_path, css_name)
+    with open(css_path, 'r') as file:
+        data = file.read().replace('\n', '')
+
+    style_def = svgwrite.container.Style(data)
+    dwg.defs.add(style_def)
+    return dwg, inkscape
 
 
 if __name__ == '__main__':

@@ -2,12 +2,12 @@ import os
 from datetime import datetime
 import subprocess
 
-from plotdotproject.settings import _OUTPUT_DIR
-from plotdot.axiDraw.main import svg_plot_layers, svg_plot
+from plotdotproject.settings import _OUTPUT_DIR, BASE_DIR
+from plotdot.axiDraw.main import svg_plot_layers, svg_plot, svg_plot_preview
 from plotdot.plotLog.figures import line_trace
 from plotdot.plotLog.patterns import linetraces
 from plotdot.plotLog.quittung import make_quittung
-from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, PX_MM, rect_layer
+from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, PX_MM, rect_layer, init_dwg
 import svgwrite
 from svgwrite.extensions import Inkscape
 
@@ -37,8 +37,7 @@ def preview_plot():
     f_in, f_out = file_def()
     k = create_svg(f_in)
     text_to_path(f_in, f_out)
-    f_path = os.path.join(output_path, 'gensvg.svg')
-    svg_plot_layers(f_out, f_path, k)
+    svg_plot_layers(f_out, 'layers_gen', k)
 
 
 def create_svg(path_svg):
@@ -49,8 +48,8 @@ def create_svg(path_svg):
         print(ln_k)
         return ln_k
 
-    dwg = svgwrite.Drawing(profile='full', size=(width_p * px_mm, height_p * px_mm))
-    inkscape = Inkscape(dwg)
+    size = (width_p * px_mm, height_p * px_mm)
+    dwg, inkscape = init_dwg(size)
 
     k = 1
     ln = 'layer'
@@ -78,7 +77,8 @@ def create_svg(path_svg):
 
 
 def text_to_path(f_in, f_out):
-    pr_str = 'inkscape --export-plain-svg %s --export-text-to-path  --export-filename=%s' % (f_in, f_out)
+    """export to f_out including layers and text to path"""
+    pr_str = 'inkscape  %s --export-text-to-path  --export-filename=%s' % (f_in, f_out)  # --export-plain-svg
     subprocess.call(pr_str, shell=True)
 
 
@@ -91,4 +91,5 @@ def file_def():
 
 
 if __name__ == '__main__':
-    plot_order()
+    #plot_order()
+    preview_plot()

@@ -15,28 +15,27 @@ def svg_from_file(file_name = 'logoetiki' + '.svg'):
 
 
 def svg_plot_layers(svg_input, outp_name='gensvg', nr_layers=1, preview=True):
-
-    layers = []
+    """
+    0 - Do not render previews
+    1 - Render pen-down movement only
+    2 - Render pen-up movement only
+    3 - Render all movement, both pen-up and pen-down [DEFAULT]
+    """
     for k in range(1, nr_layers):
-        ad = axidraw.AxiDraw()
-        ad.plot_setup(svg_input)
-        ad.options.mode = "layers"
-        ad.options.preview = preview
-        layers.append(k)
-        ad.options.layer = k #layers
-        output_svg = ad.plot_run(True)
         n = '-'.join([outp_name, str(k)]) + '.svg'
-        save_file(output_svg, n)
+        svg_plot_preview(svg_input, outp_name=n, layer=k)
 
 
-def svg_plot_preview(svg_input, outp_name='gensvg.svg'):
+def svg_plot_preview(svg_input, outp_name='gensvg.svg', layer=None):
     """
     """
     ad = axidraw.AxiDraw()
     ad.plot_setup(svg_input)
     ad.options.preview = True
     ad.options.report_time = True
-    ad.plot_run()
+    if layer:
+        ad.options.mode = "layers"
+        ad.options.layer = layer
 
     output_svg = ad.plot_run(True)
     save_file(output_svg, outp_name)
@@ -51,4 +50,6 @@ def save_file(output_svg, n):
 
 
 if __name__ == '__main__':
-    file_name = 'logoetiki' + '.svg'
+    file_name = 'layers_all' + '.svg'
+    f_path = os.path.join(_OUTPUT_DIR, file_name)
+    svg_plot_preview(f_path, outp_name='gensvg.svg')

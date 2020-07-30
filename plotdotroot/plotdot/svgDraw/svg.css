@@ -1,11 +1,11 @@
 
 @font-face {
-    font-family: 'Perfect DOS';
+    font-family: 'Perfect DOS VGA 437 Win';
      src: local("Perfect DOS VGA 437 Win");  /* name of local installation */
 }
 
 .quittung-text {
-    font-family: 'Perfect DOS';
+    font-family: 'Perfect DOS VGA 437 Win'; /* inkscape needs correct name */
     font-size: 12px;
     line-height: 16px;
     /*
