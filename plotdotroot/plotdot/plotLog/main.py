@@ -1,6 +1,9 @@
 import os
 from datetime import datetime
+import subprocess
 
+from plotdotproject.settings import _OUTPUT_DIR
+from plotdot.axiDraw.main import svg_plot_layers, svg_plot
 from plotdot.plotLog.figures import line_trace
 from plotdot.plotLog.patterns import linetraces
 from plotdot.plotLog.quittung import make_quittung
@@ -19,19 +22,34 @@ height_graph = height_p - height_q
 x_graph = mx
 y_graph = my
 
-prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+output_path = _OUTPUT_DIR
 px_mm = PX_MM
 
 
 def plot_order():
+    f_in, f_out = file_def()
+    create_svg(f_in)
+    text_to_path(f_in, f_out)
+    svg_plot(f_out)
+
+
+def preview_plot():
+    f_in, f_out = file_def()
+    k = create_svg(f_in)
+    text_to_path(f_in, f_out)
+    f_path = os.path.join(output_path, 'gensvg.svg')
+    svg_plot_layers(f_out, f_path, k)
+
+
+def create_svg(path_svg):
     def layer_name():
         nonlocal k
         ln_k = ''.join([str(k), '-', ln])
         k += 1
+        print(ln_k)
         return ln_k
-    file_name = 'layer' + '.svg'
-    f_path = os.path.join(prjct_root_path, file_name)
-    dwg = svgwrite.Drawing(f_path, profile='full', size=(width_p*px_mm, height_p*px_mm))
+
+    dwg = svgwrite.Drawing(profile='full', size=(width_p * px_mm, height_p * px_mm))
     inkscape = Inkscape(dwg)
 
     k = 1
@@ -54,10 +72,22 @@ def plot_order():
     rect_shape = (x_graph, y_graph, width_graph, height_graph)
     label_n = layer_name()
     rect_layer(dwg, inkscape, label_n, rect_shape)
-    dwg.save()
+
+    dwg.saveas(path_svg)
+    return k
 
 
+def text_to_path(f_in, f_out):
+    pr_str = 'inkscape --export-plain-svg %s --export-text-to-path  --export-filename=%s' % (f_in, f_out)
+    subprocess.call(pr_str, shell=True)
 
+
+def file_def():
+    file_name = 'layers'
+    f_path = os.path.join(output_path, file_name)
+    f_in = f_path + '_all' + '.svg'
+    f_out = f_path + 'all_txtpath' + '.svg'
+    return f_in, f_out
 
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ import os
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 PX_MM = 3.543307
 
+
 def text_svg_layer(dwg, inkscape, layer_name, txt_defs, unit_f= PX_MM):
     layer = inkscape.layer(label=layer_name, locked=True)
 

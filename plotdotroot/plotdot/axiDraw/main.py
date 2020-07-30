@@ -1,30 +1,43 @@
 import os
 from pyaxidraw import axidraw
+from plotdotproject.settings import _OUTPUT_DIR
 
-prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+def svg_plot(svg_input):
+    ad = axidraw.AxiDraw()
+    ad.plot_setup(svg_input)
+    ad.plot_run()
 
 
 def svg_from_file(file_name = 'logoetiki' + '.svg'):
-    f_path = os.path.join(prjct_root_path, file_name)
-    svg_plot(f_path)
+    f_path = os.path.join(_OUTPUT_DIR, file_name)
+    svg_plot_preview(f_path)
 
 
-def svg_plot(svg_input, outp_name = 'gensvg.svg'):
+def svg_plot_layers(svg_input, outp_name='gensvg', nr_layers=1, preview=True):
+
+    layers = []
+    for k in range(1, nr_layers):
+        ad = axidraw.AxiDraw()
+        ad.plot_setup(svg_input)
+        ad.options.mode = "layers"
+        ad.options.preview = preview
+        layers.append(k)
+        ad.options.layer = k #layers
+        output_svg = ad.plot_run(True)
+        n = '-'.join([outp_name, str(k)]) + '.svg'
+        save_file(output_svg, n)
+
+
+def svg_plot_preview(svg_input, outp_name='gensvg.svg'):
     """
-    0 - Do not render previews
-    1 - Render pen-down movement only
-    2 - Render pen-up movement only
-    3 - Render all movement, both pen-up and pen-down [DEFAULT]
-
     """
     ad = axidraw.AxiDraw()
     ad.plot_setup(svg_input)
-    ad.options.rendering = 3
     ad.options.preview = True
-
     ad.options.report_time = True
-    ad.options.pen_pos_down = 40
-    ad.options.pen_pos_up = 30
+    ad.plot_run()
+
     output_svg = ad.plot_run(True)
     save_file(output_svg, outp_name)
     print("{0}".format(ad.pt_estimate))
@@ -32,11 +45,10 @@ def svg_plot(svg_input, outp_name = 'gensvg.svg'):
 
 def save_file(output_svg, n):
     outp_name = n
-    save_f = os.path.join(prjct_root_path, outp_name)
+    save_f = os.path.join(_OUTPUT_DIR, outp_name)
     with open(save_f, 'w') as f:
         f.write(output_svg)
 
 
 if __name__ == '__main__':
     file_name = 'logoetiki' + '.svg'
-    svg_plot()
