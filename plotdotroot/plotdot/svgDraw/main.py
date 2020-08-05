@@ -1,9 +1,8 @@
 import svgwrite
-import os
-
+from svgwrite.path import Path
 # import svgutils.transform as st
 from svgwrite.extensions import Inkscape
-
+import os
 from plotdotproject.settings import BASE_DIR
 
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -12,11 +11,6 @@ PX_MM = 3.543307
 
 def text_svg_layer(dwg, inkscape, layer_name, txt_defs, unit_f= PX_MM):
     layer = inkscape.layer(label=layer_name, locked=True)
-
-    css_name = 'svg' + '.css'
-    mod_path = os.path.join(prjct_root_path, 'plotdot/svgDraw')
-    css_path = os.path.join(mod_path, css_name)
-    dwg.add_stylesheet(css_path, title="svg")  # same rules as for html files
 
     g_text = dwg.g(class_="quittung-text") #dwg.g(class_="quittung")
     for txt_def in txt_defs:
@@ -29,7 +23,7 @@ def text_svg_layer(dwg, inkscape, layer_name, txt_defs, unit_f= PX_MM):
     return layer
 
 
-def polyline_svg_layer(dwg, inkscape, layer_name, plines, unit_f = PX_MM):
+def polyline_svg_layer(dwg, inkscape, layer_name, plines, unit_f=PX_MM):
     layer = inkscape.layer(label=layer_name, locked=True)
     for pline in plines:
         p_unit = [(x * unit_f, y * unit_f) for (x, y) in pline]
@@ -65,6 +59,17 @@ def make_svg(txt_defs):
     dwg.add(g_text)
 
     return dwg
+
+
+def make_svg_from_paths(dwg, inkscape, layer_name, paths_parsed, unit_f=PX_MM):
+    layer = inkscape.layer(label=layer_name, locked=True)
+    g_shape = dwg.g(class_="path")
+    for p in paths_parsed:
+        ps = Path(p.d())
+        print(p.d())
+        g_shape.add(ps)
+    dwg.add(g_shape)
+    return layer
 
 
 def make_quittung_all():

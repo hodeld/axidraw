@@ -2,12 +2,14 @@ import os
 from datetime import datetime
 import subprocess
 
+from plotdot.svgParse.main import parse_svg
 from plotdotproject.settings import _OUTPUT_DIR, BASE_DIR
 from plotdot.axiDraw.main import svg_plot_layers, svg_plot, svg_plot_preview
-from plotdot.plotLog.figures import line_trace
+from plotdot.plotLog.figures import line_trace, line_trace_from_p
 from plotdot.plotLog.patterns import linetraces
 from plotdot.plotLog.quittung import make_quittung
-from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, PX_MM, rect_layer, init_dwg
+from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, PX_MM, rect_layer, init_dwg, \
+    make_svg_from_paths
 import svgwrite
 from svgwrite.extensions import Inkscape
 
@@ -64,13 +66,18 @@ def create_svg(path_svg):
     x0, y0, = 100, 40
     xmax, ymax = 150, 100
 
-    lines = line_trace(x0=x0, xw=xmax, xh=x0, y0=y0, yw=y0 + 3, yh=ymax, density=.2)  #
-    label_n = layer_name()
-    polyline_svg_layer(dwg, inkscape, label_n, lines)
-
     rect_shape = (x_graph, y_graph, width_graph, height_graph)
     label_n = layer_name()
     rect_layer(dwg, inkscape, label_n, rect_shape)
+
+    paths_parsed, line_path = parse_svg()
+    label_n = layer_name()
+    make_svg_from_paths(dwg, inkscape, label_n, paths_parsed, unit_f=PX_MM)
+
+    #lines = line_trace(x0=x0, xw=xmax, xh=x0, y0=y0, yw=y0 + 3, yh=ymax, density=.2)  #
+    lines = line_trace_from_p(line_path, density=1)  # works but shifted out of graph field
+    label_n = layer_name()
+    polyline_svg_layer(dwg, inkscape, label_n, lines)
 
     dwg.saveas(path_svg)
     return k
