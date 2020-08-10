@@ -22,4 +22,11 @@
 .path{
     fill: none;
     stroke: black;
+    stroke-width: 0.2px;  /* after scaling -> 1 px */
+}
+
+polyline{ /* for preview only */
+    fill: none;
+    stroke: black;
+    stroke-width: 0.2px;  /* after scaling -> 1 px */
 }

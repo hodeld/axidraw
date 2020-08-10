@@ -1,7 +1,9 @@
-from plotdotproject.settings import _OUTPUT_DIR
+from plotdotproject.settings import _OUTPUT_DIR, PX_MM
 from svgpathtools import svg2paths, wsvg, svg2paths2
 import os
 
+_DOC_UNIT_TO_MM = 1
+_SCALE_F = _DOC_UNIT_TO_MM * PX_MM
 
 def parse_svg():
     outp_name = 'paths.svg'
@@ -16,10 +18,10 @@ def parse_svg():
     # return_svg_attributes=True, or with the convenience function svg2paths2
     paths, attributes, svg_attributes = svg2paths2(file_path)
     #change_start_end(paths)
-    path_i = paths[6]  # random
+    path_i = paths[1]  # random
     line_i = path_to_line(path_i)
 
-    return paths, line_i
+    return paths, line_i, _SCALE_F
     #paths_sw = to_svgwrite(paths)
 
 
