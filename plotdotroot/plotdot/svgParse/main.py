@@ -5,24 +5,19 @@ import os
 _DOC_UNIT_TO_MM = 1
 _SCALE_F = _DOC_UNIT_TO_MM * PX_MM
 
+
 def parse_svg():
     outp_name = 'paths.svg'
     file_path = os.path.join(_OUTPUT_DIR, outp_name)
 
-    #mydoc = minidom.parse(file_path)
-    #path_tag = mydoc.getElementsByTagName("path")
-    #d_string = path_tag[0].attributes['d'].value
-    #Path_elements = svgpathtools.parse_path(d_string)
-
-    # Update: You can now also extract the svg-attributes by setting
-    # return_svg_attributes=True, or with the convenience function svg2paths2
     paths, attributes, svg_attributes = svg2paths2(file_path)
     #change_start_end(paths)
-    path_i = paths[7]  # random
-    line_i = path_to_line(path_i)
 
-    return paths, line_i, _SCALE_F
-    #paths_sw = to_svgwrite(paths)
+    lines = []
+    for p in paths:
+        lines_i = path_to_line(p)
+        lines.extend(lines_i)
+    return lines, _SCALE_F
 
 
 def change_start_end(paths):
@@ -50,15 +45,29 @@ def change_start_end(paths):
 
 
 def path_to_line(path):
+    """returns several lines if path consists of several non-touching segments"""
     def imag_to_real(s):
+        nonlocal end_b
+        if end_b and s.start != end_b:
+            return False
+
         x, y = s.start.real, s.start.imag
         line.append((x, y))
+        x, y = s.end.real, s.end.imag
+        line.append((x, y))
+        end_b = s.end
 
     line = []
-    imag_to_real(path)
+    lines = []
+    end_b = None
     for p in path:
-        imag_to_real(p)
-    return line
+        if imag_to_real(p) is False:
+            lines.append(line)
+            line = []
+            end_b = None
+            imag_to_real(p)
+    lines.append(line)
+    return lines
 
 
 if __name__ == '__main__':

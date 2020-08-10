@@ -25,13 +25,19 @@ def text_svg_layer(dwg, txt_defs, pos_f=PX_MM):
     return g_text
 
 
-def polyline_svg_layer(dwg, plines):
-    group = dwg.g(class_='polyline')
-    for pline in plines:
+def polylines(dwg, lines):
+    plines = []
+    for pline in lines:
         p_unit = [(x, y) for (x, y) in pline]
         svg_pline = dwg.polyline(p_unit)
-        #svg_pline.scale(sx=unit_f)
-        group.add(svg_pline)
+        plines.append(svg_pline)
+    return plines
+
+
+def group_elements(dwg, eles, class_n='polyline'):
+    group = dwg.g(class_=class_n)
+    for ele in eles:
+        group.add(ele)
     return group
 
 

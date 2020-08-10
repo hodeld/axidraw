@@ -2,14 +2,15 @@ import os
 from datetime import datetime
 import subprocess
 
+from plotdot.svgDraw.transform import translate
 from plotdotproject.settings import _OUTPUT_DIR, PX_MM
 from plotdot.svgParse.main import parse_svg
 from plotdot.axiDraw.main import svg_plot_layers, svg_plot, svg_plot_preview
 from plotdot.plotLog.figures import line_trace, line_trace_from_p, add_points
 from plotdot.plotLog.patterns import linetraces
 from plotdot.plotLog.quittung import make_quittung
-from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, rect_layer, init_dwg, \
-    make_svg_from_paths, add_layer
+from plotdot.svgDraw.main import make_svg, text_svg_layer, rect_layer, init_dwg, \
+    make_svg_from_paths, add_layer, group_elements, polylines
 import svgwrite
 from svgwrite.extensions import Inkscape
 
@@ -74,17 +75,34 @@ def create_svg(path_svg):
     g_rect = rect_layer(dwg, rect_shape)
     add_layer(dwg, inkscape, label_n, g_rect, unit_f=PX_MM)
 
-    paths_parsed, line_path, scale_f = parse_svg()
-    label_n = layer_name()
-    g_path = make_svg_from_paths(dwg, paths_parsed)
-    add_layer(dwg, inkscape, label_n, g_path, unit_f=PX_MM)
+    lines, scale_f = parse_svg()
 
-    #lines = line_trace(x0=x0, xw=xmax, xh=x0, y0=y0, yw=y0 + 3, yh=ymax, density=.2)  #
+    k_div = 11 # random
+    lines_first = lines[:k_div]
+    lines_scnd = lines[k_div:]
+    line_path = lines[k_div - 1]  # random
+
+    label_n = layer_name()
+    plines = polylines(dwg, lines_first)
+    g_pline = group_elements(dwg, plines, class_n='polyline')
+    add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
+
     line_n = add_points(line_path)
     lines = line_trace_from_p(line_n, density=1)
     label_n = layer_name()
-    g_pline = polyline_svg_layer(dwg, lines)
+    plines = polylines(dwg, lines)
+    g_pline = group_elements(dwg, plines, class_n='polyline')
     add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
+
+    label_n = layer_name()
+    plines = polylines(dwg, lines_scnd)
+    g_pline = group_elements(dwg, plines, class_n='polyline')
+    translate(g_pline, sx=40)
+
+    add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
+
+
+
 
     dwg.saveas(path_svg)
     return k

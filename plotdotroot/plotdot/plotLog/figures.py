@@ -1,5 +1,9 @@
 import random
 import numpy as np
+
+from plotdotproject.settings import PX_MM
+
+
 def square(x, y, size):
     path = [
         [x - size, y - size],
@@ -112,7 +116,7 @@ def line_trace(x0=0, xw=10, xh=0, y0=0, yw=0, yh=10, density=1):
     return lines
 
 
-def line_trace_from_p(line0, density=1):
+def line_trace_from_p(line0, max_w=15, max_h=15, density=1):
     """
     :return: iteratable with points in a list [(x,y)]
     """
@@ -170,10 +174,10 @@ def line_trace_from_p(line0, density=1):
             randint = random.randint(0, random_stp)
             rand_shift = (-1/2 + randint/random_stp) * rand_range
             calc_shift = factor_slugg * val_slugg * opp_dir
-            x0_k = 0 #line0[k][0] # for bending
+            x0_k = 0 # line0[k][0] # for bending
             x_new = x0_k + val_trace + shift + rand_shift + calc_shift
-            x_norm = x_new #* norm_len_x + (x_0 + k * norm_slope_x)  # todo normalize
-            y_norm = y #* norm_len_y + line_nr * norm_slope_y + y_0  # todo normalize
+            x_norm = x_new
+            y_norm = y
             line_new.append([x_new, y])
             line_norm.append([x_norm, y_norm])
         return line_new, line_norm
@@ -183,38 +187,15 @@ def line_trace_from_p(line0, density=1):
     p0 = line0[0]
     pend = line0[-1]
 
-
     x0, y0 = p0
     xh, yh = pend
-    max_w = 100 + x0
-    shift_h = 50 + y0
-    xw = max_w - x0
-    yw = abs(shift_h - y0)
-    #max_w = xw-x0
-    max_h = yh-y0
-    w_x = (xh - x0)
-    h_y = abs((yw - y0))
+    max_w = max(max_w, abs(xh-x0))
+    max_h = max(max_h, abs(yh-y0))
 
-    nr_lines = abs(int(max_w / max_h * density * nr_steps))
+    nr_lines = abs(int(max_w/(shift * max_h) * density * nr_steps))
 
-    range_steps = range(nr_steps)
-    #x0_line = np.array([0] * nr_steps)
-    yrange = np.array(range_steps)
-    #y0_line = yrange
-
-    norm_len_x = max_w / (ratio_shift_range * nr_lines)
-    norm_slope_x = w_x / nr_steps
-    x_0 = x0
-    norm_len_y = max_h / nr_steps
-    norm_slope_y = h_y / nr_lines
-    y_0 = y0
-
-    #line0 = np.column_stack((x0_line, y0_line))
     line_b = line0
 
-    #line_nr = 0
-    #line_b, line_norm = create_line()
-    #lines = [line_b]
     lines = []
 
     for line_nr in range(0, nr_lines):
@@ -224,15 +205,18 @@ def line_trace_from_p(line0, density=1):
     return lines
 
 
-def add_points(line):
-    nr_add_points = 2
+def add_points(line, unit_f=PX_MM):
     line_n = []
     for ind, (x, y) in enumerate(line):
 
         if ind > 0:
-            x_steps = (x-x_b)/(nr_add_points + 1)
-            y_steps = (y - y_b) / (nr_add_points + 1)
-            for k in range(1, nr_add_points + 1):
+            nr_add_points = int(max(abs(x-x_b)*unit_f,
+                                abs(y-y_b)*unit_f)/3)
+            if nr_add_points < 1:
+                nr_add_points = 1
+            x_steps = (x-x_b)/(nr_add_points)
+            y_steps = (y - y_b) / (nr_add_points)
+            for k in range(1, nr_add_points):
                 x_n = x_b + k * x_steps
                 y_n = y_b + k * y_steps
                 line_n.append((x_n, y_n))
