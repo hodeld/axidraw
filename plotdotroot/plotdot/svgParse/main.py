@@ -18,7 +18,7 @@ def parse_svg():
     # return_svg_attributes=True, or with the convenience function svg2paths2
     paths, attributes, svg_attributes = svg2paths2(file_path)
     #change_start_end(paths)
-    path_i = paths[1]  # random
+    path_i = paths[7]  # random
     line_i = path_to_line(path_i)
 
     return paths, line_i, _SCALE_F
@@ -48,6 +48,7 @@ def change_start_end(paths):
             except AttributeError:
                 pass
 
+
 def path_to_line(path):
     def imag_to_real(s):
         x, y = s.start.real, s.start.imag
@@ -55,10 +56,8 @@ def path_to_line(path):
 
     line = []
     imag_to_real(path)
-
     for p in path:
         imag_to_real(p)
-
     return line
 
 

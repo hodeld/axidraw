@@ -5,11 +5,11 @@ import subprocess
 from plotdotproject.settings import _OUTPUT_DIR, PX_MM
 from plotdot.svgParse.main import parse_svg
 from plotdot.axiDraw.main import svg_plot_layers, svg_plot, svg_plot_preview
-from plotdot.plotLog.figures import line_trace, line_trace_from_p
+from plotdot.plotLog.figures import line_trace, line_trace_from_p, add_points
 from plotdot.plotLog.patterns import linetraces
 from plotdot.plotLog.quittung import make_quittung
 from plotdot.svgDraw.main import make_svg, text_svg_layer, polyline_svg_layer, rect_layer, init_dwg, \
-    make_svg_from_paths
+    make_svg_from_paths, add_layer
 import svgwrite
 from svgwrite.extensions import Inkscape
 
@@ -57,27 +57,34 @@ def create_svg(path_svg):
     ln = 'layer'
     label_n = layer_name()
     txt_defs = make_quittung(x0=mx, y0=height_graph + my, w_tot=width_p)
-    text_svg_layer(dwg, inkscape, label_n, txt_defs)
+
+    g_text = text_svg_layer(dwg, txt_defs)
+    add_layer(dwg, inkscape, label_n, g_text,  unit_f=1)
 
     text_defs_t = [('ztp: ' + datetime.now().strftime('%c'), (10, 10))]
     label_n = layer_name()
-    text_svg_layer(dwg, inkscape, label_n, text_defs_t)
+    g_text = text_svg_layer(dwg, text_defs_t)
+    add_layer(dwg, inkscape, label_n, g_text, unit_f=1)
 
     x0, y0, = 100, 40
     xmax, ymax = 150, 100
 
     rect_shape = (x_graph, y_graph, width_graph, height_graph)
     label_n = layer_name()
-    rect_layer(dwg, inkscape, label_n, rect_shape)
+    g_rect = rect_layer(dwg, rect_shape)
+    add_layer(dwg, inkscape, label_n, g_rect, unit_f=PX_MM)
 
     paths_parsed, line_path, scale_f = parse_svg()
     label_n = layer_name()
-    make_svg_from_paths(dwg, inkscape, label_n, paths_parsed, unit_f=scale_f)
+    g_path = make_svg_from_paths(dwg, paths_parsed)
+    add_layer(dwg, inkscape, label_n, g_path, unit_f=PX_MM)
 
     #lines = line_trace(x0=x0, xw=xmax, xh=x0, y0=y0, yw=y0 + 3, yh=ymax, density=.2)  #
-    lines = line_trace_from_p(line_path, density=1)  # works but shifted out of graph field
+    line_n = add_points(line_path)
+    lines = line_trace_from_p(line_n, density=1)
     label_n = layer_name()
-    polyline_svg_layer(dwg, inkscape, label_n, lines, unit_f=scale_f)
+    g_pline = polyline_svg_layer(dwg, lines)
+    add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
 
     dwg.saveas(path_svg)
     return k

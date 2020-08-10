@@ -222,3 +222,22 @@ def line_trace_from_p(line0, density=1):
         line_b, line_norm = create_line()
         lines.append(line_norm)
     return lines
+
+
+def add_points(line):
+    nr_add_points = 2
+    line_n = []
+    for ind, (x, y) in enumerate(line):
+
+        if ind > 0:
+            x_steps = (x-x_b)/(nr_add_points + 1)
+            y_steps = (y - y_b) / (nr_add_points + 1)
+            for k in range(1, nr_add_points + 1):
+                x_n = x_b + k * x_steps
+                y_n = y_b + k * y_steps
+                line_n.append((x_n, y_n))
+
+        line_n.append((x, y))
+        x_b, y_b = x, y
+    return line_n
+

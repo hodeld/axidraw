@@ -9,39 +9,38 @@ from plotdotproject.settings import BASE_DIR, PX_MM
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 
-def text_svg_layer(dwg, inkscape, layer_name, txt_defs, unit_f= PX_MM):
+def add_layer(dwg, inkscape, layer_name, group, unit_f=PX_MM):
     layer = inkscape.layer(label=layer_name, locked=True)
-
-    g_text = dwg.g(class_="quittung-text") #dwg.g(class_="quittung")
-    for txt_def in txt_defs:
-        (txt, (x, y)) = txt_def
-        g_text.add(dwg.text(txt, insert=(x * unit_f, y * unit_f)))  # settings are valid for all text added to 'g'
-
-    layer.add(g_text)
+    group.scale(sx=unit_f)
+    layer.add(group)
     dwg.add(layer)
-
     return layer
 
 
-def polyline_svg_layer(dwg, inkscape, layer_name, plines, unit_f=PX_MM):
-    layer = inkscape.layer(label=layer_name, locked=True)
+def text_svg_layer(dwg, txt_defs, pos_f=PX_MM):
+    g_text = dwg.g(class_="quittung-text")  # defines font-size -> should not be scaled afterwards
+    for txt_def in txt_defs:
+        (txt, (x, y)) = txt_def
+        g_text.add(dwg.text(txt, insert=(x * pos_f, y* pos_f)))  # settings are valid for all text added to 'g'
+    return g_text
+
+
+def polyline_svg_layer(dwg, plines):
+    group = dwg.g(class_='polyline')
     for pline in plines:
         p_unit = [(x, y) for (x, y) in pline]
         svg_pline = dwg.polyline(p_unit)
-        svg_pline.scale(sx=unit_f)
-        layer.add(svg_pline)
-    dwg.add(layer)
-    return layer
+        #svg_pline.scale(sx=unit_f)
+        group.add(svg_pline)
+    return group
 
 
-def rect_layer(dwg, inkscape, layer_name, rect_shape, unit_f=PX_MM):
-    layer = inkscape.layer(label=layer_name, locked=True)
+def rect_layer(dwg, rect_shape):
     g_shape = dwg.g(class_="shape")  # (stroke="blue", fill='none')
     (x0, y0, w, h) = rect_shape
-    g_shape.add(svgwrite.shapes.Rect(insert=(x0 * unit_f, y0 * unit_f),
-                                     size=(w * unit_f, h * unit_f)))
-    layer.add(g_shape)
-    dwg.add(layer)
+    g_shape.add(svgwrite.shapes.Rect(insert=(x0, y0),
+                                     size=(w, h)))
+    return g_shape
 
 
 def make_svg(txt_defs):
@@ -62,16 +61,13 @@ def make_svg(txt_defs):
     return dwg
 
 
-def make_svg_from_paths(dwg, inkscape, layer_name, paths_parsed, unit_f=PX_MM):
-    layer = inkscape.layer(label=layer_name, locked=True)
+def make_svg_from_paths(dwg, paths_parsed):
     g_shape = dwg.g(class_="path")
     for p in paths_parsed:
         ps = Path(p.d())
-        ps.scale(sx=unit_f)
         print(p.d())
         g_shape.add(ps)
-    dwg.add(g_shape)
-    return layer
+    return g_shape
 
 
 def make_quittung_all():
