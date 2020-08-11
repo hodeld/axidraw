@@ -116,7 +116,7 @@ def line_trace(x0=0, xw=10, xh=0, y0=0, yw=0, yh=10, density=1):
     return lines
 
 
-def line_trace_from_p(line0, max_w=15, max_h=15, density=1):
+def line_trace_from_p(line0, max_w=15, max_h=15, density=1, nr_lines=None):
     """
     :return: iteratable with points in a list [(x,y)]
     """
@@ -191,8 +191,8 @@ def line_trace_from_p(line0, max_w=15, max_h=15, density=1):
     xh, yh = pend
     max_w = max(max_w, abs(xh-x0))
     max_h = max(max_h, abs(yh-y0))
-
-    nr_lines = abs(int(max_w/(shift * max_h) * density * nr_steps))
+    if nr_lines is None:
+        nr_lines = abs(int(max_w/(shift * max_h) * density * nr_steps))
 
     line_b = line0
 
@@ -202,7 +202,9 @@ def line_trace_from_p(line0, max_w=15, max_h=15, density=1):
         print('line', line_nr)
         line_b, line_norm = create_line()
         lines.append(line_norm)
-    return lines
+    xend, yend = lines[-1][-1]
+    shift_tot = (xend-xh, yend-yh)
+    return lines, shift_tot
 
 
 def add_points(line, unit_f=PX_MM):

@@ -4,6 +4,8 @@ from svgwrite.mixins import Transform
 # import svgutils.transform as st
 from svgwrite.extensions import Inkscape
 import os
+
+from plotdot.svgDraw.transform import transform_allmeths
 from plotdotproject.settings import BASE_DIR, PX_MM
 
 prjct_root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -25,11 +27,13 @@ def text_svg_layer(dwg, txt_defs, pos_f=PX_MM):
     return g_text
 
 
-def polylines(dwg, lines):
+def polylines(dwg, lines, trans_dic=None):
     plines = []
     for pline in lines:
         p_unit = [(x, y) for (x, y) in pline]
         svg_pline = dwg.polyline(p_unit)
+        if trans_dic:
+            transform_allmeths(svg_pline, trans_dic)
         plines.append(svg_pline)
     return plines
 

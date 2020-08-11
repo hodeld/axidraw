@@ -7,7 +7,7 @@ from plotdotproject.settings import _OUTPUT_DIR, PX_MM
 from plotdot.svgParse.main import parse_svg
 from plotdot.axiDraw.main import svg_plot_layers, svg_plot, svg_plot_preview
 from plotdot.plotLog.figures import line_trace, line_trace_from_p, add_points
-from plotdot.plotLog.patterns import linetraces
+from plotdot.plotLog.patterns import linetraces, line_by_line
 from plotdot.plotLog.quittung import make_quittung
 from plotdot.svgDraw.main import make_svg, text_svg_layer, rect_layer, init_dwg, \
     make_svg_from_paths, add_layer, group_elements, polylines
@@ -77,29 +77,13 @@ def create_svg(path_svg):
 
     lines, scale_f = parse_svg()
 
-    k_div = 11 # random
-    lines_first = lines[:k_div]
-    lines_scnd = lines[k_div:]
-    line_path = lines[k_div - 1]  # random
+    groups = line_by_line(dwg, lines, scale_f)
+    for g in groups:
+        label_n = layer_name()
+        add_layer(dwg, inkscape, label_n, g, unit_f=scale_f)
 
-    label_n = layer_name()
-    plines = polylines(dwg, lines_first)
-    g_pline = group_elements(dwg, plines, class_n='polyline')
-    add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
 
-    line_n = add_points(line_path)
-    lines = line_trace_from_p(line_n, density=1)
-    label_n = layer_name()
-    plines = polylines(dwg, lines)
-    g_pline = group_elements(dwg, plines, class_n='polyline')
-    add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
 
-    label_n = layer_name()
-    plines = polylines(dwg, lines_scnd)
-    g_pline = group_elements(dwg, plines, class_n='polyline')
-    translate(g_pline, sx=40)
-
-    add_layer(dwg, inkscape, label_n, g_pline, unit_f=PX_MM)
 
 
 
