@@ -51,5 +51,7 @@ def save_file(output_svg, n):
 
 if __name__ == '__main__':
     file_name = 'layers_all' + '.svg'
-    f_path = os.path.join(_OUTPUT_DIR, file_name)
-    svg_plot_preview(f_path, outp_name='gensvg.svg')
+    #f_path = os.path.join(_OUTPUT_DIR, file_name)
+    f_path = '/Users/daim/softwareDev/20_smallstuff/20_axidraw/plots/layers_all.svg'
+    svg_plot(f_path)
+    #svg_plot_preview(f_path, outp_name='gensvg.svg')

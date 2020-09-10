@@ -8,9 +8,9 @@ from plotdot.svgParse.main import parse_svg
 from plotdot.axiDraw.main import svg_plot_layers, svg_plot, svg_plot_preview
 from plotdot.plotLog.figures import line_trace, line_trace_from_p, add_points
 from plotdot.plotLog.patterns import linetraces, line_by_line
-from plotdot.plotLog.quittung import make_quittung
+from plotdot.plotLog.writeText import make_quittung, write_in_center
 from plotdot.svgDraw.main import make_svg, text_svg_layer, rect_layer, init_dwg, \
-    make_svg_from_paths, add_layer, group_elements, polylines
+    make_svg_from_paths, add_layer, group_elements, polylines, text_size_svg_layer
 import svgwrite
 from svgwrite.extensions import Inkscape
 
@@ -51,42 +51,57 @@ def create_svg(path_svg):
         print(ln_k)
         return ln_k
 
+    def quittung():
+        label_n = layer_name()
+        txt_defs = make_quittung(x0=mx, y0=height_graph + my, w_tot=width_p)
+        g_text = text_svg_layer(dwg, txt_defs)
+        add_layer(dwg, inkscape, label_n, g_text, unit_f=1)
+
+    def graph_text():
+        label_n = layer_name()
+        mx_add = 10
+        my_add = 10
+        x = x_graph + mx_add
+        y = y_graph + my_add
+        width = width_graph - 2 * mx_add
+        height = height_graph - 2 * my_add
+        area_def = (x, y, width, height)  # x0, y0, w_tot, h_tot = area_def
+        txt_defs, font_def, trans_def = write_in_center(area_def=area_def)
+        g_text = text_size_svg_layer(dwg, txt_defs, size_def=font_def, trans_def=trans_def)
+        add_layer(dwg, inkscape, label_n, g_text, unit_f=1)
+
+    def time_text():
+        text_defs_t = [('ztp: ' + datetime.now().strftime('%c'), (10, 10))]
+        label_n = layer_name()
+        g_text = text_svg_layer(dwg, text_defs_t)
+        add_layer(dwg, inkscape, label_n, g_text, unit_f=1)
+
+    def rectangle():
+        rect_shape = (x_graph, y_graph, width_graph, height_graph)
+        label_n = layer_name()
+        g_rect = rect_layer(dwg, rect_shape)
+        add_layer(dwg, inkscape, label_n, g_rect, unit_f=PX_MM)
+
+    def art_text():
+        lines, scale_f = parse_svg()
+        groups = line_by_line(dwg, lines, scale_f)
+        for g in groups:
+            label_n = layer_name()
+            add_layer(dwg, inkscape, label_n, g, unit_f=scale_f)
+
+
     size = (width_p * px_mm, height_p * px_mm)
     dwg, inkscape = init_dwg(size)
 
     k = 1
     ln = 'layer'
-    label_n = layer_name()
-    txt_defs = make_quittung(x0=mx, y0=height_graph + my, w_tot=width_p)
 
-    g_text = text_svg_layer(dwg, txt_defs)
-    add_layer(dwg, inkscape, label_n, g_text,  unit_f=1)
-
-    text_defs_t = [('ztp: ' + datetime.now().strftime('%c'), (10, 10))]
-    label_n = layer_name()
-    g_text = text_svg_layer(dwg, text_defs_t)
-    add_layer(dwg, inkscape, label_n, g_text, unit_f=1)
-
-    x0, y0, = 100, 40
-    xmax, ymax = 150, 100
-
-    rect_shape = (x_graph, y_graph, width_graph, height_graph)
-    label_n = layer_name()
-    g_rect = rect_layer(dwg, rect_shape)
-    add_layer(dwg, inkscape, label_n, g_rect, unit_f=PX_MM)
-
-    lines, scale_f = parse_svg()
-
-    groups = line_by_line(dwg, lines, scale_f)
-    for g in groups:
-        label_n = layer_name()
-        add_layer(dwg, inkscape, label_n, g, unit_f=scale_f)
-
-
-
-
-
-
+    # elements:
+    #quittung()
+    graph_text()
+    #time_text()
+    rectangle()
+    #art_text()
 
     dwg.saveas(path_svg)
     return k

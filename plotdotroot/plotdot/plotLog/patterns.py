@@ -90,7 +90,7 @@ def line_by_line(dwg, lines, scale_f):
     shift = [0, 0]
     def make_line_trace():
         line_n = add_points(l)
-        lines_traced, shift = line_trace_from_p(line_n, density=1)
+        lines_traced, shift = line_trace_from_p(line_n, density=1, nr_lines=5)
         #plines = polylines(dwg, lines_traced)
         plines = polylines(dwg, lines_traced, trans_dic)
         g_pline = group_elements(dwg, plines, class_n='polyline')

@@ -13,6 +13,9 @@
     line-height: 16px;
     */
 }
+.free-size-text{
+    font-family: 'Perfect DOS VGA 437 Win'; /* inkscape needs correct name */
+}
 
 .shape {
     fill: none;
