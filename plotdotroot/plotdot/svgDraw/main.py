@@ -27,6 +27,25 @@ def text_svg_layer(dwg, txt_defs, pos_f=PX_MM):
     return g_text
 
 
+def text_size_svg_layer(dwg, txt_defs, pos_f=PX_MM, size_def=(12, 16), trans_def=(1.0, 1.0)):
+    font_sz, line_ht = size_def
+    font_sz = round(font_sz * pos_f, 1)
+    line_ht = round(line_ht * pos_f, 1)
+    y_scale = round(trans_def[0], 2)
+
+    transform = "scale(1, %s) " % y_scale
+    style = 'font-size:%dpx;line-height: %dpx;' % (font_sz, line_ht)
+
+    g_text = dwg.g(class_="free-size-text", transform=transform, style=style)  # defines font-size -> should not be scaled afterwards
+    for txt_def in txt_defs:
+        (txt, (x, y)) = txt_def # x, y should be center of text
+        g_text.add(dwg.text(txt, text_anchor='middle',
+                            insert=(x * pos_f, y * pos_f),
+                            )
+                   )  # settings are valid for all text added to 'g'
+    return g_text
+
+
 def polylines(dwg, lines, trans_dic=None):
     plines = []
     for pline in lines:
